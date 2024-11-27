@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Highcharts - Large Data with Threshold</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+  </head>
+  <body style="padding: 100px 100px">
+    <div id="chart-container" style="width: 100%; height: 400px"></div>
+
+    <script>
+      // Atur Highcharts untuk menggunakan waktu lokal
+      Highcharts.setOptions({
+        time: {
+          useUTC: false,
+        },
+      });
+
+      // Generate 7000 data points
+      const data = [];
+      console.log(data);
+
+      const startTime = new Date("2016-12-31T06:30:00").getTime();
+      for (let i = 0; i < 7000; i++) {
+        data.push({
+          timestamp: new Date(startTime + i * 60000).toISOString(),
+          value1: Math.random() * 100,
+          value2: Math.random() * 100,
+          value3: Math.random() * 100,
+          value4: Math.random() * 100,
+          value5: Math.random() * 100,
+        });
+      }
+
+      // Ambang maksimal dan minimal
+      const thresholdMax = 75;
+      const thresholdMin = 25;
+
+      // Konversi data untuk setiap seri
+      const series = ["value1", "value2", "value3", "value4", "value5"].map(
+        (key) => ({
+          name: key,
+          data: data.map((item) => [
+            new Date(item.timestamp).getTime(),
+            item[key],
+          ]),
+          marker: {
+            enabled: false, // Nonaktifkan marker untuk performa
+          },
+        })
+      );
+
+      // Data untuk ambang maksimal
+      const maxThresholdData = data.map((item) => [
+        new Date(item.timestamp).getTime(),
+        thresholdMax,
+      ]);
+
+      // Data untuk ambang minimal
+      const minThresholdData = data.map((item) => [
+        new Date(item.timestamp).getTime(),
+        thresholdMin,
+      ]);
+
+      // Tambahkan ambang ke dalam series
+      series.push(
+        {
+          name: "Ambang Maksimal",
+          data: maxThresholdData,
+          type: "line",
+          color: "red",
+          dashStyle: "Dash",
+          marker: {
+            enabled: false,
+          },
+        },
+        {
+          name: "Ambang Minimal",
+          data: minThresholdData,
+          type: "line",
+          color: "blue",
+          dashStyle: "Dash",
+          marker: {
+            enabled: false,
+          },
+        }
+      );
+
+      // Konfigurasi Highcharts
+      Highcharts.chart("chart-container", {
+        title: {
+          text: "Grafik Data Besar dengan Ambang Maksimal dan Minimal",
+        },
+        xAxis: {
+          type: "datetime",
+          title: {
+            text: "Waktu (Jam)",
+          },
+          labels: {
+            format: "{value:%H:%M}",
+          },
+          tickInterval: 3600 * 1000,
+        },
+        yAxis: {
+          title: {
+            text: "Nilai",
+          },
+          plotLines: [
+            {
+              color: "red",
+              value: thresholdMax,
+              width: 1,
+              label: {
+                text: "Ambang Maksimal",
+                align: "right",
+                style: {
+                  color: "red",
+                },
+              },
+            },
+            {
+              color: "blue",
+              value: thresholdMin,
+              width: 1,
+              label: {
+                text: "Ambang Minimal",
+                align: "right",
+                style: {
+                  color: "blue",
+                },
+              },
+            },
+          ],
+        },
+        tooltip: {
+          headerFormat: "<b>{series.name}</b><br>",
+          pointFormat: "{point.x:%Y-%m-%d %H:%M}: {point.y}",
+        },
+        series: series,
+      });
+    </script>
+  </body>
+</html>

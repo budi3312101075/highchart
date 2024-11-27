@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Highcharts - Multiple Series with Threshold</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  </head>
+  <body style="padding: 100px 100px">
+    <div id="chart-container" style="width: 100%; height: 400px"></div>
+
+    <script>
+      // Atur Highcharts untuk menggunakan waktu lokal
+      Highcharts.setOptions({
+        time: {
+          useUTC: false, // Matikan penggunaan UTC agar waktu sesuai dengan lokal
+        },
+      });
+
+      // Data dengan format tanggal dan jam
+      const data = [
+        {
+          timestamp: "2016-12-30T06:30:00",
+          value1: 10,
+          value2: 10,
+          value3: 20,
+          value4: 12,
+          value5: 32,
+        },
+        {
+          timestamp: "2016-12-30T07:45:00",
+          value1: 30,
+          value2: 20,
+          value3: 25,
+          value4: 15,
+          value5: 35,
+        },
+        {
+          timestamp: "2016-12-30T09:30:00",
+          value1: 40,
+          value2: 30,
+          value3: 15,
+          value4: 20,
+          value5: 25,
+        },
+        {
+          timestamp: "2016-12-30T11:15:00",
+          value1: 60,
+          value2: 50,
+          value3: 30,
+          value4: 25,
+          value5: 40,
+        },
+        {
+          timestamp: "2016-12-30T13:00:00",
+          value1: 20,
+          value2: 15,
+          value3: 10,
+          value4: 5,
+          value5: 8,
+        },
+        {
+          timestamp: "2016-12-31T06:30:00",
+          value1: 20,
+          value2: 30,
+          value3: 15,
+          value4: 20,
+          value5: 25,
+        },
+      ];
+
+      // Ambang maksimal dan minimal
+      const thresholdMax = 50;
+      const thresholdMin = 10;
+
+      // Konversi data untuk setiap seri (value1, value2, value3, value4, value5)
+      const series = ["value1", "value2", "value3", "value4", "value5"].map(
+        (key) => ({
+          name: key, // Nama seri
+          data: data.map((item) => [
+            new Date(item.timestamp).getTime(), // Timestamp dalam milidetik
+            item[key], // Nilai y
+          ]),
+        })
+      );
+
+      console.log(series);
+      console.log(data);
+
+      // Data untuk ambang maksimal
+      const maxThresholdData = data.map((item) => [
+        new Date(item.timestamp).getTime(),
+        thresholdMax,
+      ]);
+
+      // Data untuk ambang minimal
+      const minThresholdData = data.map((item) => [
+        new Date(item.timestamp).getTime(),
+        thresholdMin,
+      ]);
+
+      // Tambahkan ambang ke dalam series
+      series.push(
+        {
+          name: "Ambang Maksimal",
+          data: maxThresholdData,
+          type: "line",
+          color: "red",
+          dashStyle: "Dash",
+          marker: {
+            enabled: false,
+          },
+        },
+        {
+          name: "Ambang Minimal",
+          data: minThresholdData,
+          type: "line",
+          color: "blue",
+          dashStyle: "Dash",
+          marker: {
+            enabled: false,
+          },
+        }
+      );
+
+      // Konfigurasi Highcharts
+      Highcharts.chart("chart-container", {
+        chart: {
+          type: "scatter", // Anda bisa ubah menjadi 'line' untuk grafik garis
+        },
+        title: {
+          text: "Grafik dengan Ambang Maksimal dan Minimal",
+        },
+        xAxis: {
+          type: "datetime",
+          title: {
+            text: "Waktu (Jam)",
+          },
+          labels: {
+            format: "{value:%H:%M}", // Format jam dan menit
+          },
+          tickInterval: 3600 * 1000, // Interval 1 jam
+        },
+        yAxis: {
+          title: {
+            text: "Nilai",
+          },
+          plotLines: [
+            {
+              color: "red",
+              value: thresholdMax,
+              width: 1,
+              label: {
+                text: "Ambang Maksimal",
+                align: "right",
+                style: {
+                  color: "red",
+                },
+              },
+            },
+            {
+              color: "blue",
+              value: thresholdMin,
+              width: 1,
+              label: {
+                text: "Ambang Minimal",
+                align: "right",
+                style: {
+                  color: "blue",
+                },
+              },
+            },
+          ],
+        },
+        tooltip: {
+          headerFormat: "<b>{series.name}</b><br>",
+          pointFormat: "{point.x:%Y-%m-%d %H:%M}: {point.y}",
+        },
+        series: series, // Semua data seri ditambahkan ke sini
+      });
+    </script>
+  </body>
+</html>
